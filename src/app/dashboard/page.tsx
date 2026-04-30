@@ -85,6 +85,24 @@ export default async function DashboardPage() {
           Dashboard
         </h1>
 
+        {/* Quick Actions */}
+        <div className="mb-8">
+          <Link
+            href="/dashboard/batch-calling"
+            className="inline-flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-6 py-4 transition-colors hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700 dark:hover:bg-zinc-800"
+          >
+            <span className="text-2xl">📞</span>
+            <div>
+              <p className="font-semibold text-zinc-900 dark:text-zinc-50">
+                Batch Calling
+              </p>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                Launch and manage outbound call campaigns
+              </p>
+            </div>
+          </Link>
+        </div>
+
         <div className="grid gap-6 md:grid-cols-2">
           <section className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
             <h2 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
@@ -170,7 +188,7 @@ export default async function DashboardPage() {
                     Permissions:
                   </dt>
                   <dd className="text-zinc-900 dark:text-zinc-50">
-                    {backendResponse.data.permissions.length > 0 ? (
+                    {backendResponse.data.permissions && backendResponse.data.permissions.length > 0 ? (
                       <ul className="list-inside list-disc">
                         {backendResponse.data.permissions.map((perm) => (
                           <li key={perm} className="font-mono text-xs">

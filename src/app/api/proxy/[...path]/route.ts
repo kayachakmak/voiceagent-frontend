@@ -9,7 +9,7 @@ async function proxyRequest(
 ): Promise<NextResponse> {
   const { path } = await params;
   const pathString = path.join("/");
-  const url = `${BACKEND_URL}/api/v1/${pathString}`;
+  const url = `${BACKEND_URL}/api/v1/${pathString}${request.nextUrl.search}`;
 
   let accessToken: string;
   try {
@@ -21,7 +21,8 @@ async function proxyRequest(
       );
     }
     accessToken = token;
-  } catch {
+  } catch (err) {
+    console.error("Proxy auth error:", err);
     return NextResponse.json(
       { error: "Authentication required" },
       { status: 401 }
@@ -47,8 +48,23 @@ async function proxyRequest(
 
   try {
     const response = await fetch(url, fetchOptions);
-    const data = await response.json();
+    const contentType = response.headers.get("content-type") || "";
 
+    // Binary responses (audio, etc.) — pass through as-is
+    if (!contentType.includes("application/json")) {
+      const body = await response.arrayBuffer();
+      return new NextResponse(body, {
+        status: response.status,
+        headers: {
+          "Content-Type": contentType,
+          ...(response.headers.get("content-disposition")
+            ? { "Content-Disposition": response.headers.get("content-disposition")! }
+            : {}),
+        },
+      });
+    }
+
+    const data = await response.json();
     return NextResponse.json(data, { status: response.status });
   } catch {
     return NextResponse.json(
